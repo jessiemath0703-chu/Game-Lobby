@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jessie Math 遊戲大廳 - 學習地圖</title>
+    <style>
+        /* ======================================================= */
+        /* 基礎全域樣式與排版 */
+        /* ======================================================= */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa; /* 淺灰背景 */
+            color: #333;
+        }
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px 5%; 
+        }
+        a { text-decoration: none; color: #007bff; }
+        .hidden-section { display: none; }
+
+        /* ======================================================= */
+        /* Hero 區 (Header) 與 RWD 樣式 */
+        /* ======================================================= */
+        header.main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            background-color: transparent;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: inherit;
+        }
+
+        .logo-container {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #FFD700; /* 黃色底色 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .logo-container img {
+            width: 100%; /* 圖片填滿容器 */
+            height: auto;
+            display: block;
+        }
+
+        .brand-logo h1 {
+            font-size: 1.8em;
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        nav.main-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav.main-nav a {
+            font-weight: 500;
+            color: #555;
+            padding: 5px 10px;
+        }
+
+        /* 手機 RWD 調整 */
+        @media (max-width: 768px) {
+            .brand-logo h1 { font-size: 1.5em; }
+            nav.main-nav { display: none; }
+        }
+
+        /* ======================================================= */
+        /* 年級選單導航區 */
+        /* ======================================================= */
+        .grade-menu {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 5%;
+            overflow-x: auto; /* 手機橫向滑動 */
+            border-bottom: 2px solid #ddd;
+            background-color: #ffffff;
+        }
+
+        .grade-menu-item {
+            padding: 10px 15px;
+            white-space: nowrap;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .grade-menu-item:hover, .grade-menu-item.active {
+            background-color: #fff8e1; 
+            border-color: #FFD700;
+            color: #333;
+        }
+        
+        /* ======================================================= */
+        /* 卡片與學習區塊樣式 (三層結構) */
+        /* ======================================================= */
+        .grade-planets-grid, .unit-islands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 20px 0;
+        }
+
+        .planet-card, .unit-card, .learning-module {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .coming-soon {
+            background-color: #f0f0f0;
+            color: #999;
+            cursor: not-allowed;
+            text-align: center;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.85); /* 雲霧狀 */
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #ff9800; 
+            font-size: 1.2em;
+        }
+        
+        .btn-enter, .btn-enter-unit {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #007bff; 
+            color: white;
+            border-radius: 5px;
+        }
+        
+        /* 學習模組樣式 */
+        .module-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+        }
+        
+        .step-icon {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #FFD700;
+            background-color: #333;
+            border-radius: 50%;
+            padding: 4px 10px;
+            line-height: 1;
+        }
+
+        .btn-play, .btn-resource {
+            margin-left: auto;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-play { background-color: #4CAF50; color: white; }
+        .btn-resource { background-color: #e0e0e0; color: #333; }
+        .btn-resource.download { background-color: #f44336; color: white; }
+
+        .status-tag {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        .opened { background-color: #e6ffe6; color: #4CAF50; }
+        .locked, .preparing { background-color: #ffe6e6; color: #f44336; }
+
+    </style>
+</head>
+<body>
+
+<header class="main-header">
+    <a href="javascript:void(0);" onclick="showSection('game-lobby')" class="brand-logo">
+        <div class="logo-container">
+            <img src="JESSIEMATH-Q.png" alt="Jessie Math Logo">
+        </div>
+        <h1>Jessie Math</h1>
+    </a>
+
+    <nav class="main-nav">
+        <ul>
+            <li><a href="javascript:void(0);" onclick="showSection('game-lobby')">首頁</a></li>
+            <li><a href="https://jessiemath0703-chu.github.io/website2/" target="_blank">捷析數學</a></li>
+        </ul>
+    </nav>
+</header>
+
+<nav class="grade-menu">
+    <div class="grade-menu-item" onclick="showSection('grade-1-map')">一年級</div>
+    <div class="grade-menu-item" onclick="showSection('grade-2-map')">二年級</div>
+    <div class="grade-menu-item" onclick="showSection('grade-3-map')">三年級</div>
+    <div class="grade-menu-item" onclick="showSection('grade-4-map')">四年級</div>
+    <div class="grade-menu-item" onclick="showSection('grade-5-map')">五年級</div>
+    <div class="grade-menu-item" onclick="showSection('grade-6-map')">六年級</div>
+</nav>
+
+
+<div class="container">
+    
+    <section id="game-lobby" class="hidden-section">
+        <h2>🚀 數學世界，開啟你的冒險！</h2>
+        <p>孩子走的是冒險地圖，老師掌控的是知識秩序。請選擇上方年級開始探索，或查看下方資源。</p>
+        
+        <div class="quick-links" style="margin-top: 40px;">
+            <h3>🔑 快捷資源區 (不混亂原則：集中式入口)</h3>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <a href="https://www.youtube.com/@%E6%8D%B7%E6%9E%90JESSIEMATH" target="_blank" class="btn-resource" style="background-color: #FF0000; color: white;">🎥 全部教學影片 (YouTube)</a>
+                <a href="https://drive.google.com/drive/folders/1mQAXJdYa3vbap7SNvYhQs-h3mzcZeC8e" target="_blank" class="btn-resource" style="background-color: #4285F4; color: white;">📚 全部 PDF 任務 (Google Drive)</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="grade-6-map" class="hidden-section">
+        <h2 class="grade-slogan">「六年級，是速度、比例與未知數開始奔跑的一年。」</h2>
+
+        <div class="unit-islands-grid">
+            
+            <div class="unit-card active">
+                <h4>🏝 單元一：最大公因數與最小公倍數</h4>
+                <p>狀態：<span class="status-tag opened">✅ 已開放</span></p>
+                <p>遊戲/影片/PDF：1/0/0</p>
+                <a href="javascript:void(0);" onclick="showSection('unit-detail-gcm-lcm')" class="btn-enter-unit">探索島嶼</a>
+            </div>
+            
+            <div class="unit-card active">
+                <h4>🏝 單元二：基準量與比較量</h4>
+                <p>狀態：<span class="status-tag opened">✅ 已開放</span></p>
+                <p>遊戲/影片/PDF：1/0/0</p>
+                <a href="javascript:void(0);" onclick="showSection('unit-detail-ratio')" class="btn-enter-unit">探索島嶼</a>
+            </div>
+
+            <div class="unit-card active">
+                <h4>🏝 單元三：圓周長與扇形</h4>
+                <p>狀態：<span class="status-tag opened">✅ 已開放</span></p>
+                <p>遊戲/影片/PDF：2/0/0</p>
+                <a href="javascript:void(0);" onclick="showSection('unit-detail-circle')" class="btn-enter-unit">探索島嶼</a>
+            </div>
+            
+            <div class="unit-card active">
+                <h4>🏝 單元四：速率</h4>
+                <p>狀態：<span class="status-tag opened">✅ 已開放</span></p>
+                <p>遊戲/影片/PDF：1/0/0</p>
+                <a href="javascript:void(0);" onclick="showSection('unit-detail-speed')" class="btn-enter-unit">探索島嶼</a>
+            </div>
+
+            <div class="unit-card coming-soon">
+                <h4>🔒 單元五：體積與表面積</h4>
+                <p>狀態：<span class="status-tag locked">🔒 籌備中</span></p>
+                <p>預計遊戲數：3</p>
+                <div class="overlay">🛠 老師正在打磨中...</div>
+            </div>
+            
+        </div>
+    </section>
+
+    <section id="unit-detail-gcm-lcm" class="hidden-section">
+        <h3>🧭 最大公因數與最小公倍數：學習模組列表</h3>
+        <article class="learning-module">
+            <h4>🚀 節點一：公因數公倍數挑戰</h4>
+            <div class="module-steps">
+                <div class="step step-1 active">
+                    <div class="step-icon">①</div>
+                    <h4>先玩遊戲 (3–5 分鐘)</h4>
+                    <a href="https://jessiemath0703-chu.github.io/game6-1-1/" target="_blank" class="btn-play">立即挑戰</a>
+                </div>
+                <div class="step step-2 coming-soon">
+                    <div class="step-icon">②</div>
+                    <h4>教學影片：即將推出</h4>
+                    <button class="btn-resource" disabled>🌱 籌備中</button>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section id="unit-detail-ratio" class="hidden-section">
+        <h3>🧭 基準量與比較量：學習模組列表</h3>
+        <article class="learning-module">
+            <h4>🚀 節點一：基準量與比較量的迷宮</h4>
+            <div class="module-steps">
+                <div class="step step-1 active">
+                    <div class="step-icon">①</div>
+                    <h4>先玩遊戲 (3–5 分鐘)</h4>
+                    <a href="https://jessiemath0703-chu.github.io/game6-2/" target="_blank" class="btn-play">立即挑戰</a>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section id="unit-detail-circle" class="hidden-section">
+        <h3>🧭 圓周長與扇形：學習模組列表</h3>
+        
+        <article class="learning-module" style="margin-bottom: 20px;">
+            <h4>🚀 節點一：圓周長與圓的探索</h4>
+            <div class="module-steps">
+                <div class="step step-1 active">
+                    <div class="step-icon">①</div>
+                    <h4>先玩遊戲 (圓周長基礎)</h4>
+                    <a href="https://jessiemath0703-chu.github.io/game6-3/" target="_blank" class="btn-play">立即挑戰</a>
+                </div>
+            </div>
+        </article>
+        
+        <article class="learning-module">
+            <h4>🚀 節點二：扇形弧長與周長應用</h4>
+            <div class="module-steps">
+                <div class="step step-1 active">
+                    <div class="step-icon">①</div>
+                    <h4>先玩遊戲 (扇形應用)</h4>
+                    <a href="https://jessiemath0703-chu.github.io/game6-3-1/" target="_blank" class="btn-play">立即挑戰</a>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section id="unit-detail-speed" class="hidden-section">
+        <h3>🧭 速率：學習模組列表</h3>
+        <article class="learning-module">
+            <h4>🚀 節點一：速率超速挑戰</h4>
+            <div class="module-steps">
+                <div class="step step-1 active">
+                    <div class="step-icon">①</div>
+                    <h4>先玩遊戲 (3–5 分鐘)</h4>
+                    <a href="https://jessiemath0703-chu.github.io/game6-4/" target="_blank" class="btn-play">立即挑戰</a>
+                </div>
+            </div>
+        </article>
+    </section>
+
+    <section id="grade-1-map" class="hidden-section"><h2>一年級地圖 (籌備中)</h2><p>請等待老師解鎖新星球！</p></section>
+    <section id="grade-2-map" class="hidden-section"><h2>二年級地圖 (籌備中)</h2><p>請等待老師解鎖新星球！</p></section>
+    <section id="grade-3-map" class="hidden-section"><h2>三年級地圖 (籌備中)</h2><p>請等待老師解鎖新星球！</p></section>
+    <section id="grade-4-map" class="hidden-section"><h2>四年級地圖 (籌備中)</h2><p>請等待老師解鎖新星球！</p></section>
+    <section id="grade-5-map" class="hidden-section"><h2>五年級地圖 (籌備中)</h2><p>請等待老師解鎖新星球！</p></section>
+
+</div>
+
+<script>
+    // JavaScript 函數用於切換不同區塊的顯示 (SPA 體驗)
+    function showSection(sectionId) {
+        // 隱藏所有 Section
+        document.querySelectorAll('section').forEach(section => {
+            section.style.display = 'none';
+        });
+
+        // 顯示目標 Section
+        const target = document.getElementById(sectionId);
+        if (target) {
+            target.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        // 處理年級選單的高亮狀態
+        document.querySelectorAll('.grade-menu-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // 如果切換到年級地圖，則高亮對應的年級選單
+        const gradeMatch = sectionId.match(/grade-(\d)-map/);
+        if (gradeMatch) {
+            const gradeItem = document.querySelector(`.grade-menu-item[onclick*='${sectionId}']`);
+            if (gradeItem) {
+                gradeItem.classList.add('active');
+            }
+        }
+        // 特殊處理：如果是從單元詳情切換，也要保持對應年級的高亮
+        if (sectionId === 'unit-detail-gcm-lcm' || sectionId === 'unit-detail-ratio' || sectionId === 'unit-detail-circle' || sectionId === 'unit-detail-speed') {
+            document.querySelector(`.grade-menu-item[onclick*='grade-6-map']`).classList.add('active');
+        }
+    }
+    
+    // 初始設定：DOM 載入完成後，顯示六年級地圖
+    document.addEventListener('DOMContentLoaded', () => {
+        showSection('grade-6-map'); 
+        // 初始高亮六年級選單
+        document.querySelector(`.grade-menu-item[onclick*='grade-6-map']`).classList.add('active');
+    });
+</script>
+
+</body>
+</html>
