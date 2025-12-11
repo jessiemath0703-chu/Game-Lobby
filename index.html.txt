@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jessie Math | 捷析老師 遊戲大廳</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-yellow: #FFD700;
+            --text-dark: #2c3e50;
+            --text-gray: #636e72;
+            --bg-light: #FDFBF7;
+            --card-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            --radius-main: 24px;
+            --dark-blue: #2C3E50;
+            --btn-blue: #0984e3; 
+            --btn-blue-hover: #74b9ff;
+            /* 資源彈窗顏色 */
+            --modal-game-bg: #00b894;
+            --modal-video-bg: #ff7675;
+            --modal-doc-bg: #fdcb6e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: var(--bg-light); color: var(--text-dark); line-height: 1.6; font-weight: 500; }
+        a { text-decoration: none; color: inherit; }
+        button { font-family: 'Noto Sans TC', sans-serif; }
+
+        /* --- Header --- */
+        header { background: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 1000; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo-circle { width: 55px; height: 55px; border-radius: 50%; overflow: hidden; border: 3px solid #eee; }
+        .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
+        .header-title-group { display: flex; flex-direction: column; }
+        .main-title { font-size: 1.6rem; font-weight: 900; color: var(--text-dark); line-height: 1.2; letter-spacing: -0.5px; }
+        .sub-title { font-size: 0.9rem; color: var(--text-gray); letter-spacing: 1px; font-weight: 700; }
+        .header-nav { display: flex; gap: 20px; align-items: center; }
+        .nav-btn { padding: 10px 25px; border-radius: 30px; font-weight: 700; font-size: 1rem; transition: all 0.3s ease; cursor: pointer; }
+        .nav-btn.active { background-color: var(--primary-yellow); color: var(--text-dark); box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4); }
+        .nav-btn.text-only { background: transparent; color: var(--text-dark); }
+        .nav-btn.youtube { color: #d63031; }
+        .nav-btn:hover { transform: translateY(-2px); }
+
+        /* --- Intro Section --- */
+        .intro-section { max-width: 1100px; margin: 60px auto; padding: 0 20px; text-align: center; }
+        .intro-headline { font-size: 2.6rem; font-weight: 900; color: var(--text-dark); margin-bottom: 20px; line-height: 1.4; }
+        .highlight-bg { background: linear-gradient(180deg, transparent 65%, var(--primary-yellow) 65%); display: inline-block; padding: 0 10px; color: var(--text-dark); }
+        .intro-subtext { color: #636e72; font-size: 1.2rem; margin-bottom: 50px; max-width: 800px; margin: 0 auto 50px; font-weight: 500; }
+        
+        .intro-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 30px; text-align: left; }
+        
+        /* Guide Card */
+        .guide-card { background: white; border: 2px solid #fff; border-radius: var(--radius-main); padding: 45px; box-shadow: var(--card-shadow); display: flex; flex-direction: column; justify-content: center; }
+        
+        .guide-title { 
+            color: #0984e3; 
+            font-size: 1.8rem; 
+            font-weight: 900; 
+            margin-bottom: 25px; 
+            display: flex; align-items: center; gap: 12px; 
+        }
+
+        .guide-content p { 
+            margin-bottom: 25px; 
+            font-size: 1.35rem; 
+            color: #2d3436; 
+            line-height: 1.8; 
+            font-weight: 500; 
+        }
+
+        .highlight-text { background-color: #E3F2FD; color: #0984e3; padding: 4px 10px; border-radius: 6px; font-weight: 700; }
+
+        .btn-scroll { 
+            display: inline-block; background-color: #636e72; color: white; 
+            padding: 15px 30px; 
+            border-radius: 12px; margin-top: 10px; 
+            font-size: 1.1rem; 
+            font-weight: 700; transition: 0.3s; text-align: center; width: fit-content;
+        }
+        .btn-scroll:hover { background-color: #2d3436; transform: translateY(-2px); }
+
+        /* Rules Card */
+        .rules-card { background-color: var(--dark-blue); color: white; border-radius: var(--radius-main); padding: 40px; box-shadow: var(--card-shadow); }
+        .rules-title { color: var(--primary-yellow); font-size: 1.5rem; font-weight: 900; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .rule-item { display: flex; gap: 15px; margin-bottom: 30px; align-items: flex-start; }
+        .check-icon { color: var(--primary-yellow); font-size: 1.2rem; background: rgba(255, 215, 0, 0.2); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .rule-text h4 { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; color: white; }
+        .rule-text p { font-size: 1rem; color: #b2bec3; margin: 0; }
+        
+        /* --- Grade Navigation --- */
+        .grade-nav-container { display: flex; justify-content: center; margin-bottom: 50px; padding: 0 20px; position: sticky; top: 90px; z-index: 900; }
+        .grade-nav-bar { background: white; padding: 8px 10px; border-radius: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; max-width: 850px; }
+        .grade-tab-btn { flex: 1; text-align: center; padding: 15px 0; border-radius: 40px; color: #b2bec3; font-weight: 700; font-size: 1.1rem; transition: all 0.3s; cursor: pointer; border: none; background: transparent; }
+        .grade-tab-btn:hover { color: var(--text-dark); background-color: #f1f2f6; }
+        .grade-tab-btn.active { background-color: var(--dark-blue); color: var(--primary-yellow); box-shadow: 0 4px 15px rgba(44, 62, 80, 0.4); }
+
+        /* --- Content Sections --- */
+        .grade-content { max-width: 1200px; margin: 0 auto 100px; padding: 0 20px; display: none; animation: slideUp 0.4s ease-out; }
+        .grade-content.active-section { display: block; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .section-header { text-align: center; margin-bottom: 50px; }
+        .section-header h2 { font-size: 2.2rem; font-weight: 900; color: var(--text-dark); margin-bottom: 10px; }
+        .section-header p { color: #636e72; font-size: 1.2rem; font-weight: 500; }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+
+        /* --- Syllabus Table --- */
+        .syllabus-container {
+            background: #fff;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 2px solid #f0f0f0;
+        }
+        .syllabus-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px dashed #eee; flex-wrap: wrap; gap: 15px;
+        }
+        .syllabus-title { display: flex; align-items: center; gap: 10px; }
+        .syllabus-title h3 { font-size: 1.4rem; color: var(--dark-blue); font-weight: 900; margin: 0; }
+        
+        .publisher-tabs { display: flex; gap: 8px; background: #f1f2f6; padding: 5px; border-radius: 12px; }
+        .pub-tab {
+            padding: 8px 16px; border-radius: 8px; border: none; font-size: 0.95rem; font-weight: 700;
+            color: #636e72; cursor: pointer; transition: all 0.2s; background: transparent;
+        }
+        .pub-tab:hover { color: var(--text-dark); }
+        .pub-tab.active { background: white; color: var(--btn-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        .syllabus-semesters { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .semester-block h4 { font-size: 1.1rem; color: #636e72; margin-bottom: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        
+        .semester-list { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+            gap: 12px; 
+        }
+        
+        .unit-tag {
+            background: #f8f9fa; 
+            padding: 10px 12px;
+            border-radius: 12px; 
+            font-size: 0.9rem; 
+            color: #2d3436;
+            display: flex; align-items: center; gap: 8px; 
+            transition: all 0.2s; border: 1px solid transparent;
+            /* 強制單行顯示 */
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .unit-tag i { color: var(--btn-blue); font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+        .unit-tag .u-num { 
+            font-size: 0.8rem; background: #dfe6e9; color: #636e72; 
+            padding: 2px 6px; border-radius: 4px; font-weight: 700; 
+            margin-right: 4px; flex-shrink: 0;
+        }
+        .unit-tag:hover { background: #fff; border-color: var(--primary-yellow); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        /* --- Card Styles --- */
+        .game-card { background: white; border-radius: 20px; padding: 30px 25px; box-shadow: var(--card-shadow); transition: all 0.3s; display: flex; flex-direction: column; position: relative; min-height: 340px; border: 2px solid white; }
+        .game-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); border-color: #f1f2f6; }
+        .status-badge { align-self: flex-start; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 900; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 6px; }
+        .status-badge.open { background-color: #d1f2e6; color: #00b894; }
+        .status-badge.planning { background-color: #fad390; color: #e67e22; }
+        
+        .card-title { 
+            font-size: 1.4rem; font-weight: 900; color: var(--text-dark); margin-bottom: 12px; line-height: 1.4; display: flex; align-items: flex-start; gap: 10px; 
+        }
+        .card-title i { margin-top: 5px; font-size: 1.2rem; color: #0984e3; }
+        
+        /* 關鍵字樣式優化 */
+        .keywords { 
+            font-size: 0.95rem; color: #636e72; margin-bottom: 25px; flex-grow: 1; font-weight: 500; 
+            background: #f8f9fa; padding: 15px; border-radius: 12px; line-height: 1.7;
+        }
+        .keywords strong { color: #2d3436; font-weight: 700; display: block; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #b2bec3; }
+
+        .card-action { margin-top: auto; }
+        .btn-enter { background-color: var(--btn-blue); color: white; text-align: center; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 1.1rem; width: 100%; transition: all 0.2s; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(9, 132, 227, 0.3); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-enter:hover { background-color: var(--btn-blue-hover); transform: scale(1.02); }
+        .game-card.locked { justify-content: center; align-items: center; text-align: center; background-color: #fbfbfb; border: 3px dashed #dfe6e9; box-shadow: none; min-height: 340px; }
+        .game-card.locked .status-badge { position: absolute; top: 25px; left: 25px; background: #dfe6e9; color: #636e72; }
+        .lock-icon { font-size: 3.5rem; color: #b2bec3; margin: 30px 0 15px; }
+        .construction-text { color: #b2bec3; font-weight: 700; font-size: 1.2rem; }
+        .game-card.locked .card-title { opacity: 0.3; margin-bottom: 0; justify-content: center; }
+
+        /* --- Modal --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.8); backdrop-filter: blur(5px); z-index: 2000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .modal-content { background: white; width: 90%; max-width: 500px; border-radius: 30px; padding: 40px; text-align: center; position: relative; transform: scale(0.9); transition: transform 0.3s; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-overlay.active .modal-content { transform: scale(1); }
+        .close-modal-btn { position: absolute; top: 20px; right: 20px; background: #f1f2f6; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; color: #636e72; cursor: pointer; transition: 0.2s; }
+        .close-modal-btn:hover { background: #dfe6e9; color: #2d3436; }
+        .modal-title { font-size: 1.6rem; font-weight: 900; margin-bottom: 10px; color: var(--dark-blue); }
+        .modal-subtitle { color: #636e72; margin-bottom: 25px; font-weight: 500;}
+        .modal-options { display: flex; flex-direction: column; gap: 15px; }
+        .modal-option-btn { display: flex; align-items: center; padding: 18px; border-radius: 16px; text-decoration: none; transition: transform 0.2s; color: white; font-weight: 900; font-size: 1.1rem; box-shadow: 0 8px 15px rgba(0,0,0,0.1); border: none; cursor: pointer; justify-content: flex-start; }
+        .modal-option-btn:hover { transform: translateY(-3px); filter: brightness(1.05); }
+        .modal-option-btn i { font-size: 1.6rem; margin-right: 15px; width: 30px; text-align: center; }
+        .btn-modal-game { background: var(--modal-game-bg); }
+        .btn-modal-video { background: var(--modal-video-bg); }
+        .btn-modal-doc { background: var(--modal-doc-bg); }
+        .btn-modal-disabled { background: #b2bec3; cursor: not-allowed; opacity: 0.7; pointer-events: none; }
+
+        footer { text-align: center; padding: 60px 20px; color: #b2bec3; border-top: 1px solid #eee; margin-top: 80px; background: white; font-weight: 500; }
+        
+        @media (max-width: 768px) {
+            .intro-grid { grid-template-columns: 1fr; }
+            .grade-nav-bar { flex-wrap: wrap; border-radius: 30px; padding: 15px; }
+            .header-nav { display: none; }
+            .intro-headline { font-size: 2rem; }
+            .syllabus-semesters { grid-template-columns: 1fr; gap: 20px; }
+            .syllabus-header { flex-direction: column; align-items: flex-start; }
+            .publisher-tabs { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <div class="logo-circle">
+                <img src="JESSIEMATH-Q.png" alt="Jessie Math Logo">
+            </div>
+            <div class="header-title-group">
+                <div class="main-title">Jessie Math</div>
+                <div class="sub-title">捷析數學. 遊戲大廳</div>
+            </div>
+        </div>
+        <nav class="header-nav">
+            <a href="https://jessiemath0703-chu.github.io/Game-Lobby/" class="nav-btn active">大廳首頁</a>
+            <a href="https://jessiemath0703-chu.github.io/website2/" class="nav-btn text-only">關於老師</a>
+            <a href="#" class="nav-btn text-only youtube">YouTube 頻道</a>
+        </nav>
+    </header>
+
+    <section class="intro-section">
+        <h1 class="intro-headline">
+            學習不是刷題<br>
+            <span class="highlight-bg">是一場一關一關的冒險</span>
+        </h1>
+        <p class="intro-subtext">
+            歡迎來到 Math Hall 數學大廳。在這裡，每一個年級都是一個世界，每一個主題，都是一段任務旅程。
+        </p>
+
+        <div class="intro-grid">
+            <div class="guide-card">
+                <div class="guide-title"><i class="fa-solid fa-scroll"></i> 冒險指南</div>
+                <div class="guide-content">
+                    <p>在數學大廳裡，<span class="highlight-text">孩子用自己的速度前進</span>。</p>
+                    <p>你可以先玩遊戲來熟悉概念，也可以搭配影片與任務單進行深度練習。我們不追求秒殺題目，而是追求真正的理解。</p>
+                </div>
+                <a href="#" class="btn-scroll"><i class="fa-regular fa-folder-open"></i> 領取任務卷軸 (PDF 下載)</a>
+            </div>
+
+            <div class="rules-card">
+                <div class="rules-title"><i class="fa-solid fa-shield-halved"></i> 大廳守則</div>
+                <div class="rule-item">
+                    <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+                    <div class="rule-text"><h4>每一關都能重來</h4><p>失敗只是還沒成功，多試幾次！</p></div>
+                </div>
+                <div class="rule-item">
+                    <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+                    <div class="rule-text"><h4>先理解，再求快</h4><p>想清楚規則比亂按更重要。</p></div>
+                </div>
+                <div class="rule-item">
+                    <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+                    <div class="rule-text"><h4>比昨天的自己強</h4><p>這是屬於你的冒險，不是比賽。</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="grade-nav-container">
+        <div class="grade-nav-bar">
+            <button class="grade-tab-btn" data-target="grade-1">一年級</button>
+            <button class="grade-tab-btn" data-target="grade-2">二年級</button>
+            <button class="grade-tab-btn" data-target="grade-3">三年級</button>
+            <button class="grade-tab-btn" data-target="grade-4">四年級</button>
+            <button class="grade-tab-btn" data-target="grade-5">五年級</button>
+            <button class="grade-tab-btn active" data-target="grade-6">六年級</button>
+        </div>
+    </div>
+
+    <section id="grade-1" class="grade-content"><div class="section-header"><h2>一年級萌新村</h2><p>數字的起點，快樂的出發！</p></div><div class="cards-grid" id="g1-container"></div></section>
+    <section id="grade-2" class="grade-content"><div class="section-header"><h2>二年級試煉場</h2><p>加減乘除，勇往直前！</p></div><div class="cards-grid" id="g2-container"></div></section>
+    <section id="grade-3" class="grade-content"><div class="section-header"><h2>三年級冒險島</h2><p>探索分數與幾何的新世界。</p></div><div class="cards-grid" id="g3-container"></div></section>
+    <section id="grade-4" class="grade-content"><div class="section-header"><h2>四年級勇者城</h2><p>大數運算，邏輯升級！</p></div><div class="cards-grid" id="g4-container"></div></section>
+    <section id="grade-5" class="grade-content"><div class="section-header"><h2>五年級探險區</h2><p>累積運算實力，準備迎接挑戰。</p></div><div class="cards-grid" id="g5-container"></div></section>
+    <section id="grade-6" class="grade-content active-section"><div class="section-header"><h2>六年級大冒險</h2><p>「六年級，是速度、比例與未知數開始奔跑的一年。」</p></div><div class="cards-grid" id="g6-container"></div></section>
+
+    <footer>
+        <p>&copy; 2025 Jessie Math 捷析老師. All rights reserved.</p>
+        <p>數學不迷路，Jessie 帶你走。</p>
+    </footer>
+
+    <div class="modal-overlay" id="resourceModal">
+        <div class="modal-content">
+            <button class="close-modal-btn" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            <h3 class="modal-title" id="modalTitle">主題標題</h3>
+            <p class="modal-subtitle">請選擇你要進行的任務：</p>
+            <div class="modal-options">
+                <div id="modalGameContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                <a href="#" id="modalVideoBtn" class="modal-option-btn btn-modal-video" target="_blank"><i class="fa-brands fa-youtube"></i> 觀看影片 (建構中)</a>
+                <a href="#" id="modalDocBtn" class="modal-option-btn btn-modal-doc" target="_blank"><i class="fa-solid fa-file-pdf"></i> 任務文檔 (建構中)</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 卡片與彈窗資料 (更新六年級完整 15 個主題) ---
+        const unitsData = {
+            // --- 五年級範例 (保留) ---
+            "g5-u1": {
+                title: "主題一：基礎運算挑戰",
+                keywords: "<strong>KEY CONCEPTS</strong><br>整數四則運算、括號應用",
+                games: [{ label: "基礎挑戰", url: "https://jessiemath0703-chu.github.io/game6-1/" }],
+                icon: "fa-calculator"
+            },
+            
+            // --- 六年級 (上學期) ---
+            "g6-u1": {
+                title: "主題一：質因數分解與最小公倍數",
+                keywords: "<strong>重點關鍵字</strong><br>質數與合數 • 短除法 • 互質 • 最大公因數 • 最小公倍數 • 週期問題",
+                games: [{ label: "複習五年級基礎", url: "https://jessiemath0703-chu.github.io/game6-1/" }],
+                icon: "fa-cubes-stacked"
+            },
+            "g6-u2": {
+                title: "主題二：分數除法",
+                keywords: "<strong>重點關鍵字</strong><br>最簡分數 • 倒數 • 通分 • 異分母除法 • 混合運算應用",
+                games: [{ label: "分數挑戰", url: "#" }], // 暫無連結，觸發 Modal
+                icon: "fa-divide"
+            },
+            "g6-u3": {
+                title: "主題三：規律問題",
+                keywords: "<strong>重點關鍵字</strong><br>間隔問題 • 找規則(DNA) • 選擇與組合 • 邏輯推理",
+                games: [{ label: "規律挑戰", url: "#" }],
+                icon: "fa-lightbulb"
+            },
+            "g6-u4": {
+                title: "主題四：比與比值",
+                keywords: "<strong>重點關鍵字</strong><br>相等的比 • 最簡整數比 • 比值計算 • 放大縮小概念",
+                games: [{ label: "比值挑戰", url: "#" }],
+                icon: "fa-scale-unbalanced"
+            },
+            "g6-u5": {
+                title: "主題五：小數除法",
+                keywords: "<strong>重點關鍵字</strong><br>小數點移位 • 商與餘數 • 四捨五入 • 估算與概數",
+                games: [{ label: "小數挑戰", url: "#" }],
+                icon: "fa-percent"
+            },
+            "g6-u6": {
+                title: "主題六：兩量關係與比",
+                keywords: "<strong>重點關鍵字</strong><br>基準量 vs 比較量 • 倍數關係 • 母子和差 • 還原問題",
+                games: [
+                    { label: "基礎挑戰", url: "https://jessiemath0703-chu.github.io/game6-2/" },
+                    { label: "進階挑戰", url: "https://jessiemath0703-chu.github.io/game6-2-1/" }
+                ],
+                icon: "fa-arrows-left-right-to-line"
+            },
+            "g6-u7": {
+                title: "主題七：圓周長與扇形",
+                keywords: "<strong>重點關鍵字</strong><br>圓周率(π) • 直徑 × 3.14 • 扇形弧長 • 複合圖形周長",
+                games: [
+                    { label: "基礎挑戰", url: "https://jessiemath0703-chu.github.io/game6-3/" },
+                    { label: "困難挑戰", url: "https://jessiemath0703-chu.github.io/game6-3-1/" }
+                ],
+                icon: "fa-circle-notch"
+            },
+            "g6-u8": {
+                title: "主題八：放大、縮小與比例尺",
+                keywords: "<strong>重點關鍵字</strong><br>相似圖形 • 比例尺計算 • 地圖距離換算 • 面積縮放",
+                games: [
+                    { label: "基礎挑戰", url: "https://jessiemath0703-chu.github.io/game6-5/" },
+                    { label: "進階挑戰", url: "https://jessiemath0703-chu.github.io/game6-5-1/" }
+                ],
+                icon: "fa-magnifying-glass-plus"
+            },
+            "g6-u9": {
+                title: "主題九：應用問題 (一)",
+                keywords: "<strong>重點關鍵字</strong><br>和差問題 • 雞兔同籠 • 腳數倍數 • 邏輯思考",
+                games: [
+                    { label: "基礎挑戰", url: "https://jessiemath0703-chu.github.io/game6-9/" },
+                    { label: "困難挑戰", url: "https://jessiemath0703-chu.github.io/game6-9-1/" }
+                ],
+                icon: "fa-puzzle-piece"
+            },
+
+            // --- 六年級 (下學期) ---
+            "g6-u10": {
+                title: "主題十：分數與小數四則運算",
+                keywords: "<strong>重點關鍵字</strong><br>混合運算 • 分數小數互換 • 簡化計算 • 分配律",
+                games: [{ label: "運算大師", url: "#" }],
+                icon: "fa-calculator"
+            },
+            "g6-u11": {
+                title: "主題十一：圓面積與扇形面積",
+                keywords: "<strong>重點關鍵字</strong><br>半徑 × 半徑 × 3.14 • 扇形面積 • 複合圖形 • 面積切割",
+                games: [{ label: "面積挑戰", url: "#" }],
+                icon: "fa-shapes"
+            },
+            "g6-u12": {
+                title: "主題十二：速率",
+                keywords: "<strong>重點關鍵字</strong><br>距離-時間-速率 • 單位換算 • 平均速率 • 追趕問題",
+                games: [{ label: "速率挑戰", url: "https://jessiemath0703-chu.github.io/game6-4/" }],
+                icon: "fa-gauge-high"
+            },
+            "g6-u13": {
+                title: "主題十三：統計圖表",
+                keywords: "<strong>重點關鍵字</strong><br>圓形圖繪製 • 百分比計算 • 可能性 • 機率入門",
+                games: [{ label: "圖表分析", url: "#" }],
+                icon: "fa-chart-pie"
+            },
+            "g6-u14": {
+                title: "主題十四：怎樣解題 (二)",
+                keywords: "<strong>重點關鍵字</strong><br>流水問題 • 年齡問題 • 平均問題 • 逆流順流",
+                games: [{ label: "解題挑戰", url: "#" }],
+                icon: "fa-brain"
+            },
+            "g6-u15": {
+                title: "主題十五：角柱與圓柱",
+                keywords: "<strong>重點關鍵字</strong><br>柱體體積 • 表面積展開圖 • 容積與容量 • 複合體積",
+                games: [{ label: "立體幾何", url: "#" }],
+                icon: "fa-cubes"
+            }
+        };
+
+        // --- 2. 專業對照表資料庫 (整合您的課綱) ---
+        const fullSyllabus = {
+            "grade-1": {
+                hanlin: { s1: ["數到10", "比長短", "分與合", "順序和多少", "數到30", "加一加", "認識形狀", "減一減", "讀鐘錶"], s2: ["數到100", "18以內加法", "長度", "18以內減法", "圖形和形體", "幾月幾日", "錢幣", "二位數加減", "做紀錄"] }
+            },
+            "grade-2": {
+                hanlin: { s1: ["200以內的數", "二位數加減", "認識公分", "加減應用", "容量", "加減兩步驟", "乘法(一)", "時間", "乘法(二)", "面的大小"], s2: ["1000以內的數", "重量", "加加減減", "圖形與形體", "乘法", "公尺與公分", "乘與加兩步驟", "年月日", "分裝與平分", "認識分數"] }
+            },
+            "grade-3": {
+                hanlin: { s1: ["10000以內數", "角與形狀", "10000加減", "乘法", "毫米與數線", "除法", "公斤與公克", "分數", "列表與規律"], s2: ["除法", "公升與毫升", "分數與加法", "圓", "兩步驟應用", "一位小數", "時間", "乘與除", "面積"] }
+            },
+            "grade-4": {
+                hanlin: { s1: ["一億以內的數", "乘法", "角度", "假分數帶分數", "公里", "除法", "三角形全等", "兩步驟問題", "二位小數", "統計圖表"], s2: ["概數", "四則運算", "垂直平行", "分數(一)", "形體大小", "小數乘法", "周長與面積", "分數(二)", "時間計算", "規律"] }
+            },
+            "grade-5": {
+                hanlin: { s1: ["折線圖", "倍數因數", "平面圖形", "公倍數公因數", "立體形體", "四則運算", "擴約分", "面積", "乘分數", "扇形"], s2: ["數的十進位", "分數計算", "體積", "小數", "大單位", "時間乘除", "容積", "比率百分率", "表面積", "線對稱"] }
+            },
+            // --- 更新六年級對照表 (統一為您提供的架構) ---
+            "grade-6": {
+                hanlin: {
+                    s1: ["質因數與倍數", "分數除法", "規律問題", "比與比值", "小數除法", "兩量關係", "圓與扇形周長", "放大縮小", "應用問題(一)"],
+                    s2: ["分數小數四則", "圓與扇形面積", "速率", "統計圖表", "怎樣解題(二)", "角柱與圓柱"]
+                },
+                nanyi: { s1: ["質因數與倍數", "分數除法", "規律問題", "比與比值", "小數除法", "兩量關係", "圓與扇形周長", "放大縮小", "應用問題(一)"], s2: ["分數小數四則", "圓與扇形面積", "速率", "統計圖表", "怎樣解題(二)", "角柱與圓柱"] },
+                kanghsuan: { s1: ["質因數與倍數", "分數除法", "規律問題", "比與比值", "小數除法", "兩量關係", "圓與扇形周長", "放大縮小", "應用問題(一)"], s2: ["分數小數四則", "圓與扇形面積", "速率", "統計圖表", "怎樣解題(二)", "角柱與圓柱"] }
+            }
+        };
+
+        // --- Icon 對照邏輯 (增加新類別) ---
+        function getIconForTitle(title) {
+            if (title.includes("速率") || title.includes("追趕")) return "fa-gauge-high";
+            if (title.includes("比") || title.includes("縮放")) return "fa-scale-unbalanced";
+            if (title.includes("圓") || title.includes("扇")) return "fa-circle-notch";
+            if (title.includes("柱") || title.includes("體積")) return "fa-cubes";
+            if (title.includes("統計") || title.includes("圖")) return "fa-chart-pie";
+            if (title.includes("解題") || title.includes("規律")) return "fa-lightbulb";
+            if (title.includes("數") && title.includes("到")) return "fa-arrow-up-1-9";
+            if (title.includes("加") || title.includes("減") || title.includes("四則") || title.includes("混合")) return "fa-calculator";
+            if (title.includes("乘") || title.includes("因數")) return "fa-xmark";
+            if (title.includes("除") || title.includes("分裝")) return "fa-divide";
+            if (title.includes("長度") || title.includes("公分") || title.includes("公里")) return "fa-ruler-horizontal";
+            if (title.includes("時") || title.includes("日")) return "fa-clock";
+            if (title.includes("圖") || title.includes("形") || title.includes("角") || title.includes("面")) return "fa-shapes";
+            if (title.includes("小數")) return "fa-percent";
+            if (title.includes("錢")) return "fa-coins";
+            if (title.includes("量") || title.includes("升")) return "fa-bottle-water";
+            if (title.includes("重")) return "fa-weight-hanging";
+            return "fa-star"; 
+        }
+
+        // --- 渲染對照表函數 ---
+        function renderSyllabus(gradeId, publisher) {
+            const section = document.getElementById(gradeId);
+            const containerId = gradeId.replace("grade-", "g") + "-container";
+            const cardContainer = document.getElementById(containerId);
+            
+            let syllabusDiv = section.querySelector('.syllabus-container');
+            if (!syllabusDiv) {
+                syllabusDiv = document.createElement('div');
+                syllabusDiv.className = 'syllabus-container';
+                section.insertBefore(syllabusDiv, cardContainer);
+            }
+
+            const data = fullSyllabus[gradeId][publisher] || fullSyllabus[gradeId]['hanlin']; // Fallback
+            const gradeNum = gradeId.split('-')[1];
+
+            syllabusDiv.innerHTML = `
+                <div class="syllabus-header">
+                    <div class="syllabus-title">
+                        <i class="fa-solid fa-book-open" style="color: #0984e3; font-size: 1.2rem;"></i>
+                        <h3>${gradeNum} 年級主題對照表</h3>
+                    </div>
+                    <div class="publisher-tabs">
+                        <button class="pub-tab ${publisher === 'nanyi' ? 'active' : ''}" onclick="renderSyllabus('${gradeId}', 'nanyi')">南一版</button>
+                        <button class="pub-tab ${publisher === 'kanghsuan' ? 'active' : ''}" onclick="renderSyllabus('${gradeId}', 'kanghsuan')">康軒版</button>
+                        <button class="pub-tab ${publisher === 'hanlin' ? 'active' : ''}" onclick="renderSyllabus('${gradeId}', 'hanlin')">翰林版</button>
+                    </div>
+                </div>
+                <div class="syllabus-semesters">
+                    <div class="semester-block">
+                        <h4><i class="fa-solid fa-seedling" style="color:#2ecc71;"></i> 上學期</h4>
+                        <div class="semester-list">
+                            ${data.s1.map((title, index) => `
+                                <div class="unit-tag" title="${title}">
+                                    <span class="u-num">${index + 1}</span>
+                                    <i class="fa-solid ${getIconForTitle(title)}"></i> ${title}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="semester-block">
+                        <h4><i class="fa-solid fa-tree" style="color:#27ae60;"></i> 下學期</h4>
+                        <div class="semester-list">
+                            ${data.s2.map((title, index) => `
+                                <div class="unit-tag" title="${title}">
+                                    <span class="u-num">${index + 1}</span>
+                                    <i class="fa-solid ${getIconForTitle(title)}"></i> ${title}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 渲染遊戲卡片 ---
+        function fillGrade(containerId, gradePrefix, totalUnits) {
+            const container = document.getElementById(containerId);
+            let html = "";
+            for (let i = 1; i <= totalUnits; i++) {
+                const uid = `${gradePrefix}-u${i}`;
+                if (unitsData[uid]) html += createActiveCard(uid, gradePrefix, i);
+                else html += createLockedCard(i);
+            }
+            container.innerHTML = html;
+        }
+
+        function createActiveCard(unitId, gradePrefix, unitNum) {
+            const data = unitsData[unitId];
+            const iconClass = data.icon || "fa-cube";
+            return `
+                <div class="game-card">
+                    <span class="status-badge open"><i class="fa-solid fa-check"></i> 已開放</span>
+                    <h3 class="card-title"><i class="fa-solid ${iconClass}"></i> ${data.title}</h3>
+                    <p class="keywords">${data.keywords}</p>
+                    <div class="card-action">
+                        <button class="btn-enter" onclick="openModal('${unitId}')">進入島嶼 <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+                </div>`;
+        }
+
+        function createLockedCard(unitNum) {
+            return `
+                <div class="game-card locked">
+                    <span class="status-badge planning">籌備中</span>
+                    <h3 class="card-title">主題${unitNum}：神秘主題</h3>
+                    <div class="lock-icon"><i class="fa-solid fa-lock"></i></div>
+                    <p class="construction-text">建設中...</p>
+                </div>`;
+        }
+
+        // --- Modal ---
+        const modal = document.getElementById('resourceModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const gameContainer = document.getElementById('modalGameContainer');
+        const btnVideo = document.getElementById('modalVideoBtn');
+        const btnDoc = document.getElementById('modalDocBtn');
+
+        function openModal(unitId) {
+            const data = unitsData[unitId];
+            if (!data) return;
+            modalTitle.textContent = data.title.split('：')[1] || data.title; // 簡化標題
+            gameContainer.innerHTML = '';
+            
+            if (data.games) {
+                data.games.forEach(game => {
+                    const btn = document.createElement('a');
+                    btn.className = 'modal-option-btn btn-modal-game'; 
+                    btn.href = game.url; 
+                    if(game.url === "#") {
+                         btn.classList.add('btn-modal-disabled');
+                         btn.innerHTML = `<i class="fa-solid fa-hammer"></i> ${game.label} (建構中)`;
+                    } else {
+                         btn.target = '_blank';
+                         btn.innerHTML = `<i class="fa-solid fa-gamepad"></i> ${game.label}`;
+                    }
+                    gameContainer.appendChild(btn);
+                });
+            }
+            
+            setupModalButton(btnVideo, data.video);
+            setupModalButton(btnDoc, data.doc);
+            modal.classList.add('active');
+        }
+
+        function setupModalButton(btn, link) {
+            if (link && link !== "#") { btn.href = link; btn.classList.remove('btn-modal-disabled'); btn.style.pointerEvents = "auto"; }
+            else { btn.href = "#"; btn.classList.add('btn-modal-disabled'); btn.style.pointerEvents = "none"; }
+        }
+
+        function closeModal() { modal.classList.remove('active'); }
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        // --- 初始化 ---
+        document.addEventListener("DOMContentLoaded", () => {
+            // 初始化對照表
+            renderSyllabus('grade-1', 'hanlin');
+            renderSyllabus('grade-2', 'hanlin');
+            renderSyllabus('grade-3', 'hanlin');
+            renderSyllabus('grade-4', 'hanlin');
+            renderSyllabus('grade-5', 'hanlin');
+            renderSyllabus('grade-6', 'hanlin');
+
+            // 渲染遊戲卡片
+            fillGrade("g1-container", "g1", 20);
+            fillGrade("g2-container", "g2", 20);
+            fillGrade("g3-container", "g3", 20);
+            fillGrade("g4-container", "g4", 20);
+            fillGrade("g5-container", "g5", 20);
+            fillGrade("g6-container", "g6", 15); // 六年級改為 15 個主題
+
+            // Tab 切換
+            const tabs = document.querySelectorAll('.grade-tab-btn');
+            const sections = document.querySelectorAll('.grade-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    sections.forEach(sec => sec.classList.remove('active-section'));
+                    document.getElementById(tab.getAttribute('data-target')).classList.add('active-section');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
